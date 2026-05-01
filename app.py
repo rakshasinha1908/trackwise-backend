@@ -13,9 +13,20 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/expenses.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL") or "sqlite:///expenses.db"
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////data/expenses.db"
+    
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True
+}
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
